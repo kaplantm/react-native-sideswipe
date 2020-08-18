@@ -1,5 +1,5 @@
 /* @flow */
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import {
   View,
   Animated,
@@ -7,16 +7,16 @@ import {
   FlatList,
   PanResponder,
   StyleSheet,
-} from 'react-native';
+} from "react-native";
 
 import type {
   CarouselProps,
   GestureEvent,
   GestureState,
   ScrollEvent,
-} from '../types';
+} from "../types";
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth } = Dimensions.get("window");
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
 type State = {
@@ -41,7 +41,7 @@ export default class SideSwipe extends Component<CarouselProps, State> {
     onGestureRelease: () => {},
     onIndexChange: () => {},
     renderItem: () => null,
-    shouldCapture: ({ dx }: GestureState) => (dx * dx) > 1,
+    shouldCapture: ({ dx }: GestureState) => dx * dx > 1,
     shouldRelease: () => false,
     threshold: 0,
     useVelocityForIndex: true,
@@ -134,6 +134,7 @@ export default class SideSwipe extends Component<CarouselProps, State> {
           style={[styles.flatList, flatListStyle]}
           onEndReached={this.props.onEndReached}
           onEndReachedThreshold={this.props.onEndReachedThreshold}
+          onLayout={this.onListLayout}
           scrollEventThrottle={1}
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { x: scrollPosAnim } } }],
@@ -164,6 +165,16 @@ export default class SideSwipe extends Component<CarouselProps, State> {
     length: this.props.itemWidth,
     index,
   });
+
+  onListLayout = () => {
+    if (this.state.currentIndex) {
+      this.list.scrollToIndex({
+        animated: false,
+        index: this.state.currentIndex,
+        viewOffset: this.props.contentOffset,
+      });
+    }
+  };
 
   handleGestureTerminationRequest = (e: GestureEvent, s: GestureState) =>
     this.props.shouldRelease(s);
@@ -226,7 +237,7 @@ export default class SideSwipe extends Component<CarouselProps, State> {
       () => {
         this.props.onIndexChange(newIndex);
         this.props.onGestureRelease();
-      },
+      }
     );
   };
 }
